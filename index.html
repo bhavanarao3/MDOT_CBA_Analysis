@@ -475,7 +475,7 @@
                 applicableTo: ['Build Case'],
                 selected: true,
                 annualValue: 7500,
-                justification: 'Avoided 1 incident cost and reduced safety training needs.'
+                justification: 'Avoided 1 minor incident cost and reduced safety training needs.'
             },
             {
                 benefitType: 'Faster Inspection Rates',
@@ -505,47 +505,47 @@
                 benefitType: 'Reduced Environmental Impact',
                 quantification: 'Fewer leaks, overflows. Value = (Avoided environmental fines + Cleanup costs).',
                 applicableTo: ['Build Case'],
-                selected: false,
-                annualValue: 4000,
+                selected: true, // Now selected by default
+                annualValue: 4000, // Example: Avoiding one minor spill/fine annually
                 justification: 'Reduced risk of environmental incidents, avoiding estimated $4,000 in fines/cleanup.'
             },
             {
                 benefitType: 'Improved Data Quality',
-                quantification: 'Better data for predictive maintenance and planning. Value = (Efficiency gains from better planning + Avoided costs from reactive repairs).',
+                quantification: 'Better, more consistent data from robots leads to better planning and reduced reactive maintenance. Value = (Efficiency gains from better planning + Avoided costs from reactive repairs).',
                 applicableTo: ['Build Case'],
-                selected: false,
-                annualValue: 6000,
+                selected: true, // Now selected by default
+                annualValue: 6000, // Example: 5% efficiency gain in planning, reduced emergency repairs
                 justification: 'Higher data fidelity leads to $6,000 annual savings in planning and reactive maintenance.'
             },
             {
                 benefitType: 'Reduced Labor Costs',
-                quantification: 'Fewer personnel required per inspection. Value = (FTEs reduced * Average fully loaded salary).',
+                quantification: 'Fewer personnel required per inspection or redeployment of staff. Value = (FTEs reduced * Average fully loaded salary) or (Hours saved * Labor cost per hour).',
                 applicableTo: ['Build Case'],
-                selected: false,
-                annualValue: 9000,
+                selected: true, // Now selected by default
+                annualValue: 9000, // Example: 0.1 FTE reduction or significant overtime reduction
                 justification: 'Streamlined operations reduce labor needs by $9,000 annually through efficiency gains.'
             },
             {
                 benefitType: 'Enhanced Public Perception',
-                quantification: 'Proactive maintenance avoids service disruptions. Value = (Avoided PR costs + Increased public trust).',
+                quantification: 'Proactive maintenance avoids service disruptions and negative press. Value = (Avoided PR costs + Increased public trust).',
                 applicableTo: ['Build Case'],
-                selected: false,
-                annualValue: 2500,
+                selected: true, // Now selected by default
+                annualValue: 2500, // A conservative estimate for intangible benefit
                 justification: 'Improved service reliability enhances public trust and avoids negative publicity costs.'
             },
             {
                 benefitType: 'Compliance with Regulations',
-                quantification: 'Avoiding penalties from non-compliance. Value = (Avoided fines).',
-                applicableTo: ['Base Case', 'Build Case'],
-                selected: false,
-                annualValue: 3000,
+                quantification: 'Avoiding penalties from non-compliance due to better inspection records. Value = (Avoided fines).',
+                applicableTo: ['Base Case', 'Build Case'], // Both cases can achieve compliance, but new tech enhances it
+                selected: true, // Now selected by default
+                annualValue: 3000, // Example: Avoiding a typical non-compliance fine
                 justification: 'Robust data collection ensures consistent regulatory compliance, avoiding $3,000 in potential fines.'
             },
             {
                 benefitType: 'Increased Efficiency in Reporting',
-                quantification: 'Automated reporting saves staff time. Value = (Hours saved per year * Labor cost per hour).',
+                quantification: 'Automated data collection and reporting saves staff time. Value = (Hours saved per year * Labor cost per hour).',
                 applicableTo: ['Build Case'],
-                selected: false,
+                selected: true, // Now selected by default
                 annualValue: 4500,
                 justification: 'Automated reporting reduces administrative overhead, saving $4,500 annually.'
             },
@@ -553,7 +553,7 @@
                 benefitType: 'Better Resource Planning',
                 quantification: 'Improved data leads to optimized crew and equipment scheduling. Value = (Operational cost savings).',
                 applicableTo: ['Build Case'],
-                selected: false,
+                selected: true, // Now selected by default
                 annualValue: 5500,
                 justification: 'Optimized scheduling and resource allocation lead to $5,500 in operational savings.'
             },
@@ -561,23 +561,23 @@
                 benefitType: 'Energy Savings (Robotics)',
                 quantification: 'More efficient robotics consume less energy than older models. Value = (kWh saved per year * Cost per kWh).',
                 applicableTo: ['Build Case'],
-                selected: false,
+                selected: true, // Now selected by default
                 annualValue: 1500,
                 justification: 'Newer systems offer better energy efficiency, resulting in $1,500 annual energy savings.'
             },
             {
                 benefitType: 'Reduced Training Time',
-                quantification: 'Easier-to-use systems require less training. Value = (Hours saved * Training cost per hour/person).',
+                quantification: 'Easier-to-use systems require less training for new operators or less frequent retraining. Value = (Hours saved * Training cost per hour/person).',
                 applicableTo: ['Build Case'],
-                selected: false,
+                selected: true, // Now selected by default
                 annualValue: 2000,
                 justification: 'Intuitive interfaces reduce training requirements, saving $2,000 in training costs annually.'
             },
             {
                 benefitType: 'Scalability for Future Growth',
-                quantification: 'Ability to handle more inspections without proportional cost increase. Value = (Cost of avoiding future capital investments).',
+                quantification: 'Ability to handle more inspections or larger pipe networks without proportional cost increase. Value = (Cost of avoiding future capital investments).',
                 applicableTo: ['Build Case'],
-                selected: false,
+                selected: true, // Now selected by default
                 annualValue: 7000,
                 justification: 'Scalable systems defer future capital investments for growth by $7,000 annually.'
             }
@@ -849,6 +849,7 @@
                     if (e.target.classList.contains('systemName')) {
                         item.systemName = e.target.value;
                     } else if (e.target.classList.contains('annualCost')) {
+                        // Removed step attribute, so no change needed here. parseFloat handles it.
                         item.annualCost = parseFloat(e.target.value) || 0;
                     } else if (e.target.classList.contains('costType')) {
                         item.costType = e.target.value;
@@ -911,6 +912,7 @@
                     if (e.target.classList.contains('benefitType')) {
                         item.benefitType = e.target.value;
                     } else if (e.target.classList.contains('annualValue')) {
+                        // Removed step attribute, so no change needed here. parseFloat handles it.
                         item.annualValue = parseFloat(e.target.value) || 0;
                     } else if (e.target.classList.contains('justification')) {
                         item.justification = e.target.value;
@@ -1230,7 +1232,7 @@
             });
 
             // Add Row Buttons
-            document.getElementById('addCostRowBtn').addEventListener('click', addCostRow); // No arguments needed here
+            document.getElementById('addCostRowBtn').addEventListener('click', addCostRow);
             document.getElementById('addBenefitRowBtn').addEventListener('click', addBenefitRow);
 
             // Reset Button
