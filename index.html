@@ -275,7 +275,7 @@
             <ul>
                 <li><strong>Step 1:</strong> Adjust the Discount Rate and Lifetime below.</li>
                 <li><strong>Step 2:</strong> Expand cost sections by clicking the '+' icon and enter Capital, O&M, and R&R costs in the ‘Cost Inputs’ table. 'Base Case' covers retrofitting existing robots (CUES & Envirosight sensors) and 'Build Case' covers new full system replacements (CUES Ultra Short, Redzone, Rausch).</li>
-                <li><strong>Step 3:</strong> Select applicable benefits and enter justifications in ‘Benefit Selection & Quantification’.</li>
+                <li><strong>Step 3:</strong> Enter annual benefit values for both 'Base Case' and 'Build Case' and use the 'Selected?' checkbox to include/exclude each benefit from the totals.</li>
                 <li><strong>Step 4:</strong> Review the ‘NPV & BCR Calculator’ section to see results.</li>
                 <li><strong>Step 5:</strong> Use the ‘Scenario Dashboard’ section for visual insights and simplified sensitivity analysis.</li>
             </ul>
@@ -344,12 +344,13 @@
             <thead>
                 <tr>
                     <th>Benefit Type</th>
-                    <th>Applicable to</th>
-                    <th>Selected?</th>
-                    <th>Annual Value (USD)</th>
+                    <th>Base Case Annual Value (USD)</th>
+                    <th>Build Case Annual Value (USD)</th>
                     <th>PV Factor</th>
-                    <th>Total Discounted Benefit (USD)</th>
+                    <th>Total Discounted Benefit (Base Case)</th>
+                    <th>Total Discounted Benefit (Build Case)</th>
                     <th>Justification / Formula</th>
+                    <th>Selected?</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -358,12 +359,20 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="7" style="text-align: right; font-weight: bold;">Total Applied Benefits (Base Case):</td>
+                    <td colspan="4" style="text-align: right; font-weight: bold;">Total Applied Benefits (Base Case):</td>
                     <td id="totalAppliedBenefitBase" style="font-weight: bold;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td colspan="7" style="text-align: right; font-weight: bold;">Total Applied Benefits (Build Case):</td>
+                    <td colspan="4" style="text-align: right; font-weight: bold;">Total Applied Benefits (Build Case):</td>
                     <td id="totalAppliedBenefitBuild" style="font-weight: bold;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
             </tfoot>
         </table>
@@ -464,122 +473,122 @@
             {
                 benefitType: 'Reduced Service Interruption',
                 quantification: 'Less downtime during inspections means more operational hours. Value = (Hours saved per year * Cost of downtime per hour).',
-                applicableTo: ['Base Case', 'Build Case'],
-                selected: true,
-                annualValue: 5000,
-                justification: 'Estimated 25 hours saved per year @ $200/hr.'
+                annualValueBase: 5000,
+                annualValueBuild: 7000,
+                justification: 'Estimated 25 hours saved per year @ $200/hr for base, 35 hours for build.',
+                selected: true
             },
             {
                 benefitType: 'Improved Worker Safety',
                 quantification: 'Fewer manual entries into confined spaces. Value = (Reduced injury costs + Reduced insurance premiums + Increased productivity from fewer incidents).',
-                applicableTo: ['Build Case'],
-                selected: true,
-                annualValue: 7500,
-                justification: 'Avoided 1 minor incident cost and reduced safety training needs.'
+                annualValueBase: 0,
+                annualValueBuild: 7500,
+                justification: 'Avoided 1 minor incident cost and reduced safety training needs with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Faster Inspection Rates',
                 quantification: 'Complete more inspections in less time. Value = (Additional inspections per year * Revenue/Value per inspection).',
-                applicableTo: ['Build Case'],
-                selected: true,
-                annualValue: 10000,
-                justification: 'Ability to complete 50 more inspections annually @ $200/inspection.'
+                annualValueBase: 0,
+                annualValueBuild: 10000,
+                justification: 'Ability to complete 50 more inspections annually @ $200/inspection with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Higher Inspection Accuracy',
                 quantification: 'Better identification of defects reduces rework/future repair costs. Value = (Cost of avoided rework/repairs due to missed defects).',
-                applicableTo: ['Build Case'],
-                selected: true,
-                annualValue: 12000,
-                justification: 'Estimated 2 major avoided repairs due to early detection.'
+                annualValueBase: 0,
+                annualValueBuild: 12000,
+                justification: 'Estimated 2 major avoided repairs due to early detection with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Extended Asset Lifespan',
                 quantification: 'Better monitoring leads to timely maintenance, extending pipe life. Value = (Annualized replacement cost of asset / % extension).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 8000, // Example: Deferring $80,000 replacement by 10% over 10 years
-                justification: 'Proactive maintenance extends asset life, deferring replacement costs by $8,000 annually.'
+                annualValueBase: 0,
+                annualValueBuild: 8000,
+                justification: 'Proactive maintenance extends asset life, deferring replacement costs by $8,000 annually with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Reduced Environmental Impact',
                 quantification: 'Fewer leaks, overflows. Value = (Avoided environmental fines + Cleanup costs).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 4000, // Example: Avoiding one minor spill/fine annually
-                justification: 'Reduced risk of environmental incidents, avoiding estimated $4,000 in fines/cleanup.'
+                annualValueBase: 0,
+                annualValueBuild: 4000,
+                justification: 'Reduced risk of environmental incidents, avoiding estimated $4,000 in fines/cleanup with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Improved Data Quality',
                 quantification: 'Better, more consistent data from robots leads to better planning and reduced reactive maintenance. Value = (Efficiency gains from better planning + Avoided costs from reactive repairs).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 6000, // Example: 5% efficiency gain in planning, reduced emergency repairs
-                justification: 'Higher data fidelity leads to $6,000 annual savings in planning and reactive maintenance.'
+                annualValueBase: 0,
+                annualValueBuild: 6000,
+                justification: 'Higher data fidelity leads to $6,000 annual savings in planning and reactive maintenance with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Reduced Labor Costs',
                 quantification: 'Fewer personnel required per inspection or redeployment of staff. Value = (FTEs reduced * Average fully loaded salary) or (Hours saved * Labor cost per hour).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 9000, // Example: 0.1 FTE reduction or significant overtime reduction
-                justification: 'Streamlined operations reduce labor needs by $9,000 annually through efficiency gains.'
+                annualValueBase: 0,
+                annualValueBuild: 9000,
+                justification: 'Streamlined operations reduce labor needs by $9,000 annually through efficiency gains with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Enhanced Public Perception',
                 quantification: 'Proactive maintenance avoids service disruptions and negative press. Value = (Avoided PR costs + Increased public trust).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 2500, // A conservative estimate for intangible benefit
-                justification: 'Improved service reliability enhances public trust and avoids negative publicity costs.'
+                annualValueBase: 0,
+                annualValueBuild: 2500,
+                justification: 'Improved service reliability enhances public trust and avoids negative publicity costs with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Compliance with Regulations',
                 quantification: 'Avoiding penalties from non-compliance due to better inspection records. Value = (Avoided fines).',
-                applicableTo: ['Base Case', 'Build Case'], // Both cases can achieve compliance, but new tech enhances it
-                selected: true, // Now selected by default
-                annualValue: 3000, // Example: Avoiding a typical non-compliance fine
-                justification: 'Robust data collection ensures consistent regulatory compliance, avoiding $3,000 in potential fines.'
+                annualValueBase: 1000,
+                annualValueBuild: 3000,
+                justification: 'Robust data collection ensures consistent regulatory compliance, avoiding potential fines.',
+                selected: true
             },
             {
                 benefitType: 'Increased Efficiency in Reporting',
                 quantification: 'Automated data collection and reporting saves staff time. Value = (Hours saved per year * Labor cost per hour).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 4500,
-                justification: 'Automated reporting reduces administrative overhead, saving $4,500 annually.'
+                annualValueBase: 0,
+                annualValueBuild: 4500,
+                justification: 'Automated reporting reduces administrative overhead, saving $4,500 annually with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Better Resource Planning',
                 quantification: 'Improved data leads to optimized crew and equipment scheduling. Value = (Operational cost savings).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 5500,
-                justification: 'Optimized scheduling and resource allocation lead to $5,500 in operational savings.'
+                annualValueBase: 0,
+                annualValueBuild: 5500,
+                justification: 'Optimized scheduling and resource allocation lead to $5,500 in operational savings with new systems.',
+                selected: true
             },
             {
                 benefitType: 'Energy Savings (Robotics)',
                 quantification: 'More efficient robotics consume less energy than older models. Value = (kWh saved per year * Cost per kWh).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 1500,
-                justification: 'Newer systems offer better energy efficiency, resulting in $1,500 annual energy savings.'
+                annualValueBase: 0,
+                annualValueBuild: 1500,
+                justification: 'Newer systems offer better energy efficiency, resulting in $1,500 annual energy savings.',
+                selected: true
             },
             {
                 benefitType: 'Reduced Training Time',
                 quantification: 'Easier-to-use systems require less training for new operators or less frequent retraining. Value = (Hours saved * Training cost per hour/person).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 2000,
-                justification: 'Intuitive interfaces reduce training requirements, saving $2,000 in training costs annually.'
+                annualValueBase: 0,
+                annualValueBuild: 2000,
+                justification: 'Intuitive interfaces reduce training requirements, saving $2,000 in training costs annually.',
+                selected: true
             },
             {
                 benefitType: 'Scalability for Future Growth',
                 quantification: 'Ability to handle more inspections or larger pipe networks without proportional cost increase. Value = (Cost of avoiding future capital investments).',
-                applicableTo: ['Build Case'],
-                selected: true, // Now selected by default
-                annualValue: 7000,
-                justification: 'Scalable systems defer future capital investments for growth by $7,000 annually.'
+                annualValueBase: 0,
+                annualValueBuild: 7000,
+                justification: 'Scalable systems defer future capital investments for growth by $7,000 annually.',
+                selected: true
             }
         ];
 
@@ -599,13 +608,14 @@
             return (1 - Math.pow(1 + r, -lifetime)) / r;
         }
 
-        function calculateDiscountedValue(annualCost, costType, pvFactor) {
-            if (costType === 'Capital') {
-                return annualCost;
-            } else if (costType === 'O&M' || costType === 'R&R') {
-                return annualCost * pvFactor;
+        function calculateDiscountedValue(annualAmount, type, pvFactor) {
+            // For costs: Capital is 1x, O&M/R&R are PV Factor
+            // For benefits: All are treated like O&M/R&R (annual value over lifetime)
+            if (type === 'Capital') {
+                return annualAmount;
+            } else { // 'O&M', 'R&R', or 'Benefit'
+                return annualAmount * pvFactor;
             }
-            return 0;
         }
 
         function formatCurrency(value) {
@@ -701,35 +711,27 @@
             let buildTotalBenefit = 0;
 
             currentBenefits.forEach((item, index) => {
-                const discountedBenefit = calculateDiscountedValue(item.annualValue, 'O&M', pvFactor); // Benefits are like O&M
-                const applicableBaseChecked = item.applicableTo.includes('Base Case') ? 'checked' : '';
-                const applicableBuildChecked = item.applicableTo.includes('Build Case') ? 'checked' : '';
+                // Calculate discounted benefits only if selected
+                const discountedBenefitBase = item.selected ? calculateDiscountedValue(item.annualValueBase, 'Benefit', pvFactor) : 0;
+                const discountedBenefitBuild = item.selected ? calculateDiscountedValue(item.annualValueBuild, 'Benefit', pvFactor) : 0;
 
                 let rowHtml = `
                     <tr data-row-index="${index}">
                         <td><input type="text" class="benefitType" value="${item.benefitType}"></td>
-                        <td>
-                            <label><input type="checkbox" class="applicableToBase" ${applicableBaseChecked}> Base</label><br>
-                            <label><input type="checkbox" class="applicableToBuild" ${applicableBuildChecked}> Build</label>
-                        </td>
-                        <td><input type="checkbox" class="benefitSelected" ${item.selected ? 'checked' : ''}></td>
-                        <td><input type="number" class="annualValue" value="${item.annualValue}" min="0"></td>
+                        <td><input type="number" class="annualValueBase" value="${item.annualValueBase}" min="0"></td>
+                        <td><input type="number" class="annualValueBuild" value="${item.annualValueBuild}" min="0"></td>
                         <td class="pvFactor">${pvFactor.toFixed(4)}</td>
-                        <td class="totalDiscountedBenefit-item">${formatCurrency(discountedBenefit)}</td>
+                        <td class="totalDiscountedBenefit-item-base">${formatCurrency(discountedBenefitBase)}</td>
+                        <td class="totalDiscountedBenefit-item-build">${formatCurrency(discountedBenefitBuild)}</td>
                         <td><input type="text" class="justification" value="${item.justification || ''}"></td>
+                        <td><input type="checkbox" class="benefitSelected" ${item.selected ? 'checked' : ''}></td>
                         <td><button class="delete-btn" data-row-index="${index}">Delete</button></td>
                     </tr>
                 `;
                 tableBody.insertAdjacentHTML('beforeend', rowHtml);
 
-                if (item.selected) {
-                    if (item.applicableTo.includes('Base Case')) {
-                        baseTotalBenefit += discountedBenefit;
-                    }
-                    if (item.applicableTo.includes('Build Case')) {
-                        buildTotalBenefit += discountedBenefit;
-                    }
-                }
+                baseTotalBenefit += discountedBenefitBase;
+                buildTotalBenefit += discountedBenefitBuild;
             });
 
             document.getElementById('totalAppliedBenefitBase').textContent = formatCurrency(baseTotalBenefit);
@@ -820,10 +822,10 @@
             currentBenefits.push({
                 benefitType: 'New Benefit Item',
                 quantification: 'Add quantification method here.',
-                applicableTo: ['Build Case'], // Default to build case
-                selected: true,
-                annualValue: 0,
-                justification: ''
+                annualValueBase: 0,
+                annualValueBuild: 0,
+                justification: '',
+                selected: true // New benefit items are selected by default
             });
             renderBenefitTable();
         }
@@ -849,7 +851,6 @@
                     if (e.target.classList.contains('systemName')) {
                         item.systemName = e.target.value;
                     } else if (e.target.classList.contains('annualCost')) {
-                        // Removed step attribute, so no change needed here. parseFloat handles it.
                         item.annualCost = parseFloat(e.target.value) || 0;
                     } else if (e.target.classList.contains('costType')) {
                         item.costType = e.target.value;
@@ -911,25 +912,14 @@
 
                     if (e.target.classList.contains('benefitType')) {
                         item.benefitType = e.target.value;
-                    } else if (e.target.classList.contains('annualValue')) {
-                        // Removed step attribute, so no change needed here. parseFloat handles it.
-                        item.annualValue = parseFloat(e.target.value) || 0;
+                    } else if (e.target.classList.contains('annualValueBase')) {
+                        item.annualValueBase = parseFloat(e.target.value) || 0;
+                    } else if (e.target.classList.contains('annualValueBuild')) {
+                        item.annualValueBuild = parseFloat(e.target.value) || 0;
                     } else if (e.target.classList.contains('justification')) {
                         item.justification = e.target.value;
                     } else if (e.target.classList.contains('benefitSelected')) {
                         item.selected = e.target.checked;
-                    } else if (e.target.classList.contains('applicableToBase')) {
-                        if (e.target.checked && !item.applicableTo.includes('Base Case')) {
-                            item.applicableTo.push('Base Case');
-                        } else if (!e.target.checked) {
-                            item.applicableTo = item.applicableTo.filter(caseType => caseType !== 'Base Case');
-                        }
-                    } else if (e.target.classList.contains('applicableToBuild')) {
-                        if (e.target.checked && !item.applicableTo.includes('Build Case')) {
-                            item.applicableTo.push('Build Case');
-                        } else if (!e.target.checked) {
-                            item.applicableTo = item.applicableTo.filter(caseType => caseType !== 'Build Case');
-                        }
                     }
                     renderBenefitTable(); // Re-render to update discounted benefits and totals
                 };
@@ -981,16 +971,12 @@
             let buildBenefitTotal = 0;
 
             currentBenefits.forEach(item => {
-                if (item.selected) {
-                    const adjustedBenefit = (item.annualValue * (1 + sensitivityAdjustment / 100));
-                    const discountedBenefit = calculateDiscountedValue(adjustedBenefit, 'O&M', pvFactor); // Benefits are treated like O&M for PV factor
+                if (item.selected) { // Only include if selected
+                    const adjustedBenefitBase = (item.annualValueBase * (1 + sensitivityAdjustment / 100));
+                    const adjustedBenefitBuild = (item.annualValueBuild * (1 + sensitivityAdjustment / 100));
 
-                    if (item.applicableTo.includes('Base Case')) {
-                        baseBenefitTotal += discountedBenefit;
-                    }
-                    if (item.applicableTo.includes('Build Case')) {
-                        buildBenefitTotal += discountedBenefit;
-                    }
+                    baseBenefitTotal += calculateDiscountedValue(adjustedBenefitBase, 'Benefit', pvFactor);
+                    buildBenefitTotal += calculateDiscountedValue(adjustedBenefitBuild, 'Benefit', pvFactor);
                 }
             });
 
