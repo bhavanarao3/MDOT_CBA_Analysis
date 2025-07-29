@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robotics Procurement Project: Cost-Benefit Analysis</title>
+    <title>Video Pipe Analysis: Cost-Benefit WorkBook</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -34,14 +34,14 @@
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
-            vertical-align: top; /* Align content to top for multi-line inputs */
+            vertical-align: top;
         }
         th {
             background-color: #e9ecef;
             color: #333;
         }
         input[type="number"], input[type="text"], select {
-            width: calc(100% - 2px); /* Account for border */
+            width: calc(100% - 2px);
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -64,6 +64,21 @@
             margin-bottom: 20px;
             border-bottom: 2px solid #0056b3;
             padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .section-header button:hover {
+            background-color: #0056b3;
         }
         .summary-box {
             background-color: #f8f9fa;
@@ -167,35 +182,35 @@
         /* Chart Styles */
         .chart-container {
             width: 100%;
-            height: 300px; /* Fixed height for consistency, allows Chart.js to scale content */
+            height: 300px;
             margin: 20px auto;
             padding: 15px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            display: flex; /* For flexible centering of canvas */
+            display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
         .chart-container canvas {
-            max-height: 100%; /* Ensure canvas respects container height */
-            width: 100% !important; /* Override Chart.js inline width */
-            height: 100% !important; /* Override Chart.js inline height */
+            max-height: 100%;
+            width: 100% !important;
+            height: 100% !important;
         }
         .charts-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-top: 20px;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            flex-wrap: wrap;
         }
         @media (max-width: 900px) {
             .charts-grid {
-                grid-template-columns: 1fr; /* Stack charts on smaller screens */
+                grid-template-columns: 1fr;
             }
             .chart-container {
-                height: 350px; /* Slightly taller for mobile readability */
+                height: 350px;
             }
         }
         .sensitivity-control {
@@ -215,6 +230,39 @@
             width: 80%;
             margin: 0 auto;
         }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .add-row-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        .add-row-btn:hover {
+            background-color: #218838;
+        }
+        .controls-row {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+        .controls-row button {
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -233,7 +281,14 @@
             </ul>
         </div>
 
-        <h2 class="section-header">Cost Inputs</h2>
+        <div class="controls-row">
+            <button id="resetButton" class="section-header-btn">Reset to Defaults</button>
+        </div>
+
+        <h2 class="section-header">
+            <span>Cost Inputs</span>
+            <button id="addCostRowBtn" class="add-row-btn">Add New Cost Item Group</button>
+        </h2>
 
         <div class="dynamic-inputs">
             <div>
@@ -260,1255 +315,935 @@
                     <th>PV Factor</th>
                     <th>Total Discounted Cost (USD)</th>
                     <th>Notes</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="costInputsTableBody">
-                <tr class="cost-group-header" data-case-type="Base Case" data-group-id="cues-base">
-                    <td><span class="toggle-icon">+</span> Base Case</td>
-                    <td>CUES Robot Retrofits (Summary)</td>
-                    <td>Summary</td>
-                    <td></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost"></td>
-                    <td><input type="text" class="notes" value="Combined costs for CUES sensor retrofits" readonly></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="HD PTZ Camera"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="12500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit HD PTZ Camera for CUES"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="HD PTZ Camera O&M"></td>
-                    <td><select class="costType"><option value="O&M" selected>O&M</option><option value="Capital">Capital</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="1250" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annual O&M for new HD PTZ Camera"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="HD PTZ Camera R&R"></td>
-                    <td><select class="costType"><option value="R&R" selected>R&R</option><option value="Capital">Capital</option><option value="O&M">O&M</option></select></td>
-                    <td><input type="number" class="annualCost" value="950" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annualized R&R for HD PTZ Camera"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="OZIII Camera"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="9500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit OZIII Camera for CUES"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="OZIII Camera O&M"></td>
-                    <td><select class="costType"><option value="O&M" selected>O&M</option><option value="Capital">Capital</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="900" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annual O&M for OZIII Camera"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="OZIII Camera R&R"></td>
-                    <td><select class="costType"><option value="R&R" selected>R&R</option><option value="Capital">Capital</option><option value="O&M">O&M</option></select></td>
-                    <td><input type="number" class="annualCost" value="700" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annualized R&R for OZIII Camera"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Wide Angle Camera"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="4250" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Wide Angle Camera for CUES"></td>
-                </tr>
-                 <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="CUES Fish-eye"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="7000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit CUES Fish-eye Camera"></td>
-                </tr>
-                 <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Thermal Imaging"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="13500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Thermal Imaging for CUES"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="FLIR IR Add-on"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="10000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit FLIR IR Add-on for CUES"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Laser Profiler"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="12500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Laser Profiler for CUES"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="CUES Laser Profiler"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="13500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit CUES Laser Profiler"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Sensor Control Software (CUES)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="6500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Sensor Control Software for CUES"></td>
-                </tr>
-                 <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="GraniteNet Add-ons (CUES)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="4750" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit GraniteNet Add-ons for CUES"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="IR Ring Light (CUES)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="2750" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit IR Ring Light for CUES"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="CUES Infrared Ring Light"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="3300" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit CUES Infrared Ring Light"></td>
-                </tr>
-
-
-                <tr class="cost-group-header" data-case-type="Base Case" data-group-id="envirosight-base">
-                    <td><span class="toggle-icon">+</span> Base Case</td>
-                    <td>Envirosight Rover Retrofits (Summary)</td>
-                    <td>Summary</td>
-                    <td></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost"></td>
-                    <td><input type="text" class="notes" value="Combined costs for Envirosight sensor retrofits" readonly></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="HD PTZ Camera (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="14000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit HD PTZ Camera for Envirosight"></td>
-                </tr>
-                 <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Envirosight AXIAL Camera"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="7000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Envirosight AXIAL Camera"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Rear Camera (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="5250" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Rear Camera for Envirosight"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Laser Profiler (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="14500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Laser Profiler for Envirosight"></td>
-                </tr>
-                 <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Envirosight Laser Profiler"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="15250" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Envirosight Laser Profiler"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="LiDAR Module (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="27500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit LiDAR Module for Envirosight"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Velodyne Puck/Ouster OS0"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="12000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Velodyne Puck/Ouster OS0 for Envirosight"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Inclinometer (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="1650" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Inclinometer for Envirosight"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Thermal Imaging (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="14500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Thermal Imaging for Envirosight"></td>
-                </tr>
-                 <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="FLIR IR Add-on (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="10000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit FLIR IR Add-on for Envirosight"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Sensor Control Software (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="7250" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit Sensor Control Software for Envirosight"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="envirosight-base">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="WinCan VX + GraniteNet (Envirosight)"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="8000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Retrofit WinCan VX + GraniteNet for Envirosight"></td>
-                </tr>
-
-
-                <tr class="cost-group-header" data-case-type="Build Case" data-group-id="cues-ultrashort-build">
-                    <td><span class="toggle-icon">+</span> Build Case</td>
-                    <td>CUES Ultra Short III (Summary)</td>
-                    <td>Summary</td>
-                    <td></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost"></td>
-                    <td><input type="text" class="notes" value="Full system replacement: CUES Ultra Short III" readonly></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-ultrashort-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="CUES Ultra Short III System Capital"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="115000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Initial purchase"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-ultrashort-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="CUES Ultra Short III O&M"></td>
-                    <td><select class="costType"><option value="O&M" selected>O&M</option><option value="Capital">Capital</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="11500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annual O&M for new CUES Ultra Short III"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="cues-ultrashort-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="CUES Ultra Short III R&R"></td>
-                    <td><select class="costType"><option value="R&R" selected>R&R</option><option value="Capital">Capital</option><option value="O&M">O&M</option></select></td>
-                    <td><input type="number" class="annualCost" value="9000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annualized R&R for CUES Ultra Short III"></td>
-                </tr>
-
-                <tr class="cost-group-header" data-case-type="Build Case" data-group-id="redzone-build">
-                    <td><span class="toggle-icon">+</span> Build Case</td>
-                    <td>Redzone Responder (Summary)</td>
-                    <td>Summary</td>
-                    <td></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost"></td>
-                    <td><input type="text" class="notes" value="Full system replacement: Redzone Responder" readonly></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="redzone-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Redzone Responder System Capital"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="145000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Initial purchase"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="redzone-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Redzone Responder O&M"></td>
-                    <td><select class="costType"><option value="O&M" selected>O&M</option><option value="Capital">Capital</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="14000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annual O&M for new Redzone Responder"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="redzone-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Redzone Responder R&R"></td>
-                    <td><select class="costType"><option value="R&R" selected>R&R</option><option value="Capital">Capital</option><option value="O&M">O&M</option></select></td>
-                    <td><input type="number" class="annualCost" value="11000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annualized R&R for Redzone Responder"></td>
-                </tr>
-
-                <tr class="cost-group-header" data-case-type="Build Case" data-group-id="rausch-build">
-                    <td><span class="toggle-icon">+</span> Build Case</td>
-                    <td>Rausch L135 (Summary)</td>
-                    <td>Summary</td>
-                    <td></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost"></td>
-                    <td><input type="text" class="notes" value="Full system replacement: Rausch L135" readonly></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="rausch-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Rausch L135 System Capital"></td>
-                    <td><select class="costType"><option value="Capital" selected>Capital</option><option value="O&M">O&M</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="177500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Initial purchase"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="rausch-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Rausch L135 O&M"></td>
-                    <td><select class="costType"><option value="O&M" selected>O&M</option><option value="Capital">Capital</option><option value="R&R">R&R</option></select></td>
-                    <td><input type="number" class="annualCost" value="16000" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annual O&M for new Rausch L135"></td>
-                </tr>
-                <tr class="cost-detail-row" data-group-id="rausch-build">
-                    <td></td>
-                    <td><input type="text" class="systemName" value="Rausch L135 R&R"></td>
-                    <td><select class="costType"><option value="R&R" selected>R&R</option><option value="Capital">Capital</option><option value="O&M">O&M</option></select></td>
-                    <td><input type="number" class="annualCost" value="12500" min="0"></td>
-                    <td class="pvFactor"></td>
-                    <td class="totalDiscountedCost-item"></td>
-                    <td><input type="text" class="notes" value="Annualized R&R for Rausch L135"></td>
-                </tr>
+                <!-- Cost rows will be dynamically inserted here -->
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5" style="text-align: right; font-weight: bold;">Total Discounted Costs (Base Case):</td>
+                    <td colspan="6" style="text-align: right; font-weight: bold;">Total Discounted Costs (Base Case):</td>
                     <td id="totalDiscountedCostBase" style="font-weight: bold;"></td>
-                    <td></td>
+                    <td></td> <!-- For the Action column -->
                 </tr>
                 <tr>
-                    <td colspan="5" style="text-align: right; font-weight: bold;">Total Discounted Costs (Build Case):</td>
+                    <td colspan="6" style="text-align: right; font-weight: bold;">Total Discounted Costs (Build Case):</td>
                     <td id="totalDiscountedCostBuild" style="font-weight: bold;"></td>
-                    <td></td>
+                    <td></td> <!-- For the Action column -->
                 </tr>
             </tfoot>
         </table>
 
-        <h2 class="section-header">Benefit Selection & Quantification</h2>
+        <h2 class="section-header">
+            <span>Benefit Selection & Quantification</span>
+            <button id="addBenefitRowBtn" class="add-row-btn">Add Benefit Item</button>
+        </h2>
 
         <table>
             <thead>
                 <tr>
                     <th>Benefit Type</th>
-                    <th>How to Quantify</th>
                     <th>Applicable to</th>
                     <th>Selected?</th>
                     <th>Annual Value (USD)</th>
-                    <th>Justification/Formula</th>
-                    <th>Applied Benefit (USD)</th>
+                    <th>PV Factor</th>
+                    <th>Total Discounted Benefit (USD)</th>
+                    <th>Justification / Formula</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="benefitInputsTableBody">
-                <tr>
-                    <td><select class="benefitType">
-                        <option selected>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Compare number of defects detected per 1,000ft against manual inspection results; track false-negative/positive rates via follow-up verification."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case" selected>Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="15000" min="0"></td>
-                    <td><input type="text" class="justification" value="Avoided rework due to better data: $5k/project * 3 proj"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option selected>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Measure linear feet of pipe inspected per hour/day versus traditional techniques; calculate percent reduction in inspection cycle time."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case" selected>Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="20000" min="0"></td>
-                    <td><input type="text" class="justification" value="1000 hrs saved * $20/hr"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option selected>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Tally average crew size and personnel hours required per inspection job before and after deployment."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="10000" min="0"></td>
-                    <td><input type="text" class="justification" value="Reduction of 1 FTE at $10k/year"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option selected>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Calculate total labor expense per linear ft/month using wage and overtime data, pre- and post-automation."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected"></td>
-                    <td><input type="number" class="annualBenefitValue" value="5000" min="0"></td>
-                    <td><input type="text" class="justification" value="10% reduction in overtime pay"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option selected>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Track total hours/days of pipeline/draingage downtime per inspection cycle, and monetize using disruption cost estimates."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="8000" min="0"></td>
-                    <td><input type="text" class="justification" value="Reduced service downtime by 20 hours/year @ $400/hr"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option selected>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Count and cost number of excavations avoided per year by comparing historical and post-implementation repair records."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="25000" min="0"></td>
-                    <td><input type="text" class="justification" value="Avoided 5 unnecessary excavations @ $5000 each"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option selected>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Use asset management systems to estimate average years of service life extension per pipe segment based on early issue detection and timely interventions."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected"></td>
-                    <td><input type="number" class="annualBenefitValue" value="7000" min="0"></td>
-                    <td><input type="text" class="justification" value="Prolonged asset life by 1 year for X assets"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option selected>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Count emergency repair events and associated costs avoided per year (pre/post-robotics adoption)."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="12000" min="0"></td>
-                    <td><input type="text" class="justification" value="Avoided 2 emergency repairs @ $6000 each"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option selected>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Monitor number/rate of confined space entries and reportable safety incidents before and after robotics deployment."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case" selected>Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="10000" min="0"></td>
-                    <td><input type="text" class="justification" value="Reduced insurance claims & injury costs"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option selected>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Track compliance findings, audit pass rates, or reduced remediation orders; document how quickly and thoroughly reports can be produced."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="9000" min="0"></td>
-                    <td><input type="text" class="justification" value="Avoided penalties for non-compliance"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option selected>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Inventory types and volume of data collected (e.g., gigabytes per inspection, number of 3D models/images delivered) and usage in maintenance planning or predictive analytics."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="8000" min="0"></td>
-                    <td><input type="text" class="justification" value="Improved decision support: $2k/analysis * 4 analysis"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option selected>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Chart average time interval between inspections on key assets and observe increase in inspection frequency with robots."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected" checked></td>
-                    <td><input type="number" class="annualBenefitValue" value="25000" min="0"></td>
-                    <td><input type="text" class="justification" value="25% increase in inspection capacity * $1000/inspection"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                 <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option selected>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Count reduction in heavy equipment deployments, estimate CO₂ emissions avoided, and tally fewer work-zone setup hours."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected"></td>
-                    <td><input type="number" class="annualBenefitValue" value="3000" min="0"></td>
-                    <td><input type="text" class="justification" value="Reduced fuel costs and carbon footprint"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option selected>Reduced Traffic Disruptions</option>
-                        <option>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Estimate total lane closure hours avoided per year and cost savings to public and agency from less traffic/pedestrian disruption."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected"></td>
-                    <td><input type="number" class="annualBenefitValue" value="6000" min="0"></td>
-                    <td><input type="text" class="justification" value="Reduced traffic management costs"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
-                <tr>
-                    <td><select class="benefitType">
-                        <option>Higher Inspection Accuracy</option>
-                        <option>Faster Inspection Rates</option>
-                        <option>Reduced Labor Requirements</option>
-                        <option>Lower Direct Labor Costs</option>
-                        <option>Reduced Service Interruption</option>
-                        <option>Minimized Excavation</option>
-                        <option>Extended Asset Life</option>
-                        <option>Lower Emergency Repair Frequency</option>
-                        <option>Improved Worker Safety</option>
-                        <option>Regulatory Compliance/Audit Readiness</option>
-                        <option>Richer, More Actionable Data</option>
-                        <option>More Frequent Inspection Cycles</option>
-                        <option>Environmental Impact Reduction</option>
-                        <option>Reduced Traffic Disruptions</option>
-                        <option selected>Faster Time-to-Report</option>
-                    </select></td>
-                    <td><input type="text" class="benefitDescription" value="Record average time from completion of fieldwork to delivery of actionable digital reports to decision-makers or maintenance crews."></td>
-                    <td><select multiple class="applicableTo">
-                        <option value="Base Case">Base Case</option>
-                        <option value="Build Case" selected>Build Case</option>
-                    </select></td>
-                    <td><input type="checkbox" class="benefitSelected"></td>
-                    <td><input type="number" class="annualBenefitValue" value="4000" min="0"></td>
-                    <td><input type="text" class="justification" value="Faster decision making, reduced administrative overhead"></td>
-                    <td class="appliedBenefit"></td>
-                </tr>
+                <!-- Benefit rows will be dynamically inserted here -->
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="6" style="text-align: right; font-weight: bold;">Total Applied Benefits (Base Case):</td>
+                    <td colspan="7" style="text-align: right; font-weight: bold;">Total Applied Benefits (Base Case):</td>
                     <td id="totalAppliedBenefitBase" style="font-weight: bold;"></td>
                 </tr>
                 <tr>
-                    <td colspan="6" style="text-align: right; font-weight: bold;">Total Applied Benefits (Build Case):</td>
+                    <td colspan="7" style="text-align: right; font-weight: bold;">Total Applied Benefits (Build Case):</td>
                     <td id="totalAppliedBenefitBuild" style="font-weight: bold;"></td>
                 </tr>
             </tfoot>
         </table>
 
         <h2 class="section-header">NPV & BCR Calculator</h2>
-
         <div class="npv-bcr-grid">
             <div class="case-summary">
                 <h4>Base Case Summary</h4>
-                <div class="summary-item">
-                    <span>Total Discounted Cost:</span> <span id="npvBcrCostBase"></span>
-                </div>
-                <div class="summary-item">
-                    <span>Total Discounted Benefit:</span> <span id="npvBcrBenefitBase"></span>
-                </div>
-                <div class="summary-item">
-                    <span>Net Present Value (NPV):</span> <span id="npvBase"></span>
-                </div>
-                <div class="summary-item">
-                    <span>Benefit-Cost Ratio (BCR):</span> <span id="bcrBase"></span>
-                </div>
+                <div class="summary-item"><span>Total Discounted Costs:</span> <span id="baseCostSummary"></span></div>
+                <div class="summary-item"><span>Total Discounted Benefits:</span> <span id="baseBenefitSummary"></span></div>
+                <div class="summary-item"><span>Net Present Value (NPV):</span> <span id="baseNPV"></span></div>
+                <div class="summary-item"><span>Benefit-Cost Ratio (BCR):</span> <span id="baseBCR"></span></div>
             </div>
-
             <div class="case-summary">
                 <h4>Build Case Summary</h4>
-                <div class="summary-item">
-                    <span>Total Discounted Cost:</span> <span id="npvBcrCostBuild"></span>
-                </div>
-                <div class="summary-item">
-                    <span>Total Discounted Benefit:</span> <span id="npvBcrBenefitBuild"></span>
-                </div>
-                <div class="summary-item">
-                    <span>Net Present Value (NPV):</span> <span id="npvBuild"></span>
-                </div>
-                <div class="summary-item">
-                    <span>Benefit-Cost Ratio (BCR):</span> <span id="bcrBuild"></span>
-                </div>
+                <div class="summary-item"><span>Total Discounted Costs:</span> <span id="buildCostSummary"></span></div>
+                <div class="summary-item"><span>Total Discounted Benefits:</span> <span id="buildBenefitSummary"></span></div>
+                <div class="summary-item"><span>Net Present Value (NPV):</span> <span id="buildNPV"></span></div>
+                <div class="summary-item"><span>Benefit-Cost Ratio (BCR):</span> <span id="buildBCR"></span></div>
             </div>
         </div>
 
-        <h2 class="section-header">Scenario Dashboard (Interactive View)</h2>
-        <p>This section provides visual insights into your Cost-Benefit Analysis.</p>
-
+        <h2 class="section-header">Scenario Dashboard</h2>
         <div class="charts-grid">
             <div class="chart-container">
                 <h3>Lifecycle Cost Composition</h3>
-                <canvas id="lifecycleCostChart"></canvas>
+                <canvas id="costCompositionChart"></canvas>
             </div>
             <div class="chart-container">
                 <h3>NPV & BCR Comparison</h3>
-                <canvas id="npvBcrComparisonChart"></canvas>
+                <canvas id="npvBcrChart"></canvas>
             </div>
         </div>
 
         <div class="sensitivity-control">
-            <h3>Simplified Sensitivity Analysis: Global Cost/Benefit Adjustment</h3>
-            <label for="sensitivitySlider">Adjust all Costs and Benefits by: <span id="sensitivityValue">0%</span></label>
+            <label for="sensitivitySlider">Sensitivity Analysis: Adjust all Costs/Benefits by <span id="sensitivityValue">0</span>%</label>
             <input type="range" id="sensitivitySlider" min="-20" max="20" value="0" step="1">
-            <div class="charts-grid">
-                <div class="chart-container" style="max-width: 500px;">
-                    <h4>Adjusted NPV Comparison</h4>
-                    <canvas id="sensitivityNPVChart"></canvas>
-                </div>
+            <div class="chart-container">
+                <h3>Adjusted NPV Comparison</h3>
+                <canvas id="adjustedNpvChart"></canvas>
             </div>
         </div>
 
-    </div>
+    </div> <!-- End of container -->
 
     <script>
-        // Global variables for charts
-        let lifecycleCostChart, npvBcrComparisonChart, sensitivityNPVChart;
+        // --- Default Data Storage ---
+        const defaultCosts = [
+            { caseType: 'Base Case', type: 'group', name: 'CUES Robot Retrofits (Summary)', id: 'cues-base', notes: 'Combined costs for CUES sensor retrofits', expanded: false },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'HD PTZ Camera', costType: 'Capital', annualCost: 12500, notes: 'Retrofit HD PTZ Camera for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'HD PTZ Camera O&M', costType: 'O&M', annualCost: 1250, notes: 'Annual O&M for new HD PTZ Camera' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'HD PTZ Camera R&R', costType: 'R&R', annualCost: 950, notes: 'Annualized R&R for HD PTZ Camera' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'OZIII Camera', costType: 'Capital', annualCost: 9500, notes: 'Retrofit OZIII Camera for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'OZIII Camera O&M', costType: 'O&M', annualCost: 900, notes: 'Annual O&M for OZIII Camera' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'OZIII Camera R&R', costType: 'R&R', annualCost: 700, notes: 'Annualized R&R for OZIII Camera' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'Wide Angle Camera', costType: 'Capital', annualCost: 4250, notes: 'Retrofit Wide Angle Camera for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'CUES Fish-eye', costType: 'Capital', annualCost: 7000, notes: 'Retrofit CUES Fish-eye Camera' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'Thermal Imaging', costType: 'Capital', annualCost: 13500, notes: 'Retrofit Thermal Imaging for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'FLIR IR Add-on', costType: 'Capital', annualCost: 10000, notes: 'Retrofit FLIR IR Add-on for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'Laser Profiler', costType: 'Capital', annualCost: 12500, notes: 'Retrofit Laser Profiler for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'CUES Laser Profiler', costType: 'Capital', annualCost: 13500, notes: 'Retrofit CUES Laser Profiler' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'Sensor Control Software (CUES)', costType: 'Capital', annualCost: 6500, notes: 'Retrofit Sensor Control Software for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'GraniteNet Add-ons (CUES)', costType: 'Capital', annualCost: 4750, notes: 'Retrofit GraniteNet Add-ons for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'IR Ring Light (CUES)', costType: 'Capital', annualCost: 2750, notes: 'Retrofit IR Ring Light for CUES' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'cues-base', systemName: 'CUES Infrared Ring Light', costType: 'Capital', annualCost: 3300, notes: 'Retrofit CUES Infrared Ring Light' },
 
-        // --- PV Factor Calculation ---
+            { caseType: 'Base Case', type: 'group', name: 'Envirosight Rover Retrofits (Summary)', id: 'envirosight-base', notes: 'Combined costs for Envirosight sensor retrofits', expanded: false },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'HD PTZ Camera (Envirosight)', costType: 'Capital', annualCost: 14000, notes: 'Retrofit HD PTZ Camera for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Envirosight AXIAL Camera', costType: 'Capital', annualCost: 7000, notes: 'Retrofit Envirosight AXIAL Camera' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Rear Camera (Envirosight)', costType: 'Capital', annualCost: 5250, notes: 'Retrofit Rear Camera for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Laser Profiler (Envirosight)', costType: 'Capital', annualCost: 14500, notes: 'Retrofit Laser Profiler for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Envirosight Laser Profiler', costType: 'Capital', annualCost: 15250, notes: 'Retrofit Envirosight Laser Profiler' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'LiDAR Module (Envirosight)', costType: 'Capital', annualCost: 27500, notes: 'Retrofit LiDAR Module for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Velodyne Puck/Ouster OS0', costType: 'Capital', annualCost: 12000, notes: 'Retrofit Velodyne Puck/Ouster OS0 for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Inclinometer (Envirosight)', costType: 'Capital', annualCost: 1650, notes: 'Retrofit Inclinometer for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Thermal Imaging (Envirosight)', costType: 'Capital', annualCost: 14500, notes: 'Retrofit Thermal Imaging for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'FLIR IR Add-on (Envirosight)', costType: 'Capital', annualCost: 10000, notes: 'Retrofit FLIR IR Add-on for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'Sensor Control Software (Envirosight)', costType: 'Capital', annualCost: 7250, notes: 'Retrofit Sensor Control Software for Envirosight' },
+            { caseType: 'Base Case', type: 'detail', groupId: 'envirosight-base', systemName: 'WinCan VX + GraniteNet (Envirosight)', costType: 'Capital', annualCost: 8000, notes: 'Retrofit WinCan VX + GraniteNet for Envirosight' },
+
+            { caseType: 'Build Case', type: 'group', name: 'CUES Ultra Short III (Summary)', id: 'cues-ultrashort-build', notes: 'Full system replacement: CUES Ultra Short III', expanded: false },
+            { caseType: 'Build Case', type: 'detail', groupId: 'cues-ultrashort-build', systemName: 'CUES Ultra Short III System Capital', costType: 'Capital', annualCost: 115000, notes: 'Initial purchase' },
+            { caseType: 'Build Case', type: 'detail', groupId: 'cues-ultrashort-build', systemName: 'CUES Ultra Short III O&M', costType: 'O&M', annualCost: 11500, notes: 'Annual O&M for new CUES Ultra Short III' },
+            { caseType: 'Build Case', type: 'detail', groupId: 'cues-ultrashort-build', systemName: 'CUES Ultra Short III R&R', costType: 'R&R', annualCost: 9000, notes: 'Annualized R&R for CUES Ultra Short III' },
+
+            { caseType: 'Build Case', type: 'group', name: 'Redzone System (Summary)', id: 'redzone-build', notes: 'Full system replacement: Redzone', expanded: false },
+            { caseType: 'Build Case', type: 'detail', groupId: 'redzone-build', systemName: 'Redzone System Capital', costType: 'Capital', annualCost: 130000, notes: 'Initial purchase' },
+            { caseType: 'Build Case', type: 'detail', groupId: 'redzone-build', systemName: 'Redzone System O&M', costType: 'O&M', annualCost: 13000, notes: 'Annual O&M for Redzone System' },
+            { caseType: 'Build Case', type: 'detail', groupId: 'redzone-build', systemName: 'Redzone System R&R', costType: 'R&R', annualCost: 10000, notes: 'Annualized R&R for Redzone System' },
+
+            { caseType: 'Build Case', type: 'group', name: 'Rausch System (Summary)', id: 'rausch-build', notes: 'Full system replacement: Rausch', expanded: false },
+            { caseType: 'Build Case', type: 'detail', groupId: 'rausch-build', systemName: 'Rausch System Capital', costType: 'Capital', annualCost: 120000, notes: 'Initial purchase' },
+            { caseType: 'Build Case', type: 'detail', groupId: 'rausch-build', systemName: 'Rausch System O&M', costType: 'O&M', annualCost: 12000, notes: 'Annual O&M for Rausch System' },
+            { caseType: 'Build Case', type: 'detail', groupId: 'rausch-build', systemName: 'Rausch System R&R', costType: 'R&R', annualCost: 9500, notes: 'Annualized R&R for Rausch System' },
+        ];
+
+        const defaultBenefits = [
+            {
+                benefitType: 'Reduced Service Interruption',
+                quantification: 'Less downtime during inspections means more operational hours. Value = (Hours saved per year * Cost of downtime per hour).',
+                applicableTo: ['Base Case', 'Build Case'],
+                selected: true,
+                annualValue: 5000,
+                justification: 'Estimated 25 hours saved per year @ $200/hr.'
+            },
+            {
+                benefitType: 'Improved Worker Safety',
+                quantification: 'Fewer manual entries into confined spaces. Value = (Reduced injury costs + Reduced insurance premiums + Increased productivity from fewer incidents).',
+                applicableTo: ['Build Case'],
+                selected: true,
+                annualValue: 7500,
+                justification: 'Avoided 1 incident cost and reduced safety training needs.'
+            },
+            {
+                benefitType: 'Faster Inspection Rates',
+                quantification: 'Complete more inspections in less time. Value = (Additional inspections per year * Revenue/Value per inspection).',
+                applicableTo: ['Build Case'],
+                selected: true,
+                annualValue: 10000,
+                justification: 'Ability to complete 50 more inspections annually @ $200/inspection.'
+            },
+            {
+                benefitType: 'Higher Inspection Accuracy',
+                quantification: 'Better identification of defects reduces rework/future repair costs. Value = (Cost of avoided rework/repairs due to missed defects).',
+                applicableTo: ['Build Case'],
+                selected: true,
+                annualValue: 12000,
+                justification: 'Estimated 2 major avoided repairs due to early detection.'
+            },
+            {
+                benefitType: 'Extended Asset Lifespan',
+                quantification: 'Better monitoring leads to timely maintenance, extending pipe life. Value = (Annualized replacement cost of asset / % extension).',
+                applicableTo: ['Build Case'],
+                selected: false, // Default to not selected
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Reduced Environmental Impact',
+                quantification: 'Fewer leaks, overflows. Value = (Avoided environmental fines + Cleanup costs).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Improved Data Quality',
+                quantification: 'Better data for predictive maintenance and planning. Value = (Efficiency gains from better planning + Avoided costs from reactive repairs).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Reduced Labor Costs',
+                quantification: 'Fewer personnel required per inspection. Value = (FTEs reduced * Average fully loaded salary).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Enhanced Public Perception',
+                quantification: 'Proactive maintenance avoids service disruptions. Value = (Avoided PR costs + Increased public trust).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Compliance with Regulations',
+                quantification: 'Avoiding penalties from non-compliance. Value = (Avoided fines).',
+                applicableTo: ['Base Case', 'Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Increased Efficiency in Reporting',
+                quantification: 'Automated reporting saves staff time. Value = (Hours saved per year * Labor cost per hour).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Better Resource Planning',
+                quantification: 'Improved data leads to optimized crew and equipment scheduling. Value = (Operational cost savings).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Energy Savings (Robotics)',
+                quantification: 'More efficient robotics consume less energy than older models. Value = (kWh saved per year * Cost per kWh).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Reduced Training Time',
+                quantification: 'Easier-to-use systems require less training. Value = (Hours saved * Training cost per hour/person).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            },
+            {
+                benefitType: 'Scalability for Future Growth',
+                quantification: 'Ability to handle more inspections without proportional cost increase. Value = (Cost of avoiding future capital investments).',
+                applicableTo: ['Build Case'],
+                selected: false,
+                annualValue: 0,
+                justification: ''
+            }
+        ];
+
+        let currentCosts = JSON.parse(JSON.stringify(defaultCosts)); // Deep copy
+        let currentBenefits = JSON.parse(JSON.stringify(defaultBenefits)); // Deep copy
+
+        let costCompositionChart;
+        let npvBcrChart;
+        let adjustedNpvChart;
+
+        // --- Core Calculation Functions ---
         function calculatePVFactor(discountRate, lifetime) {
             const r = discountRate / 100;
-            const n = lifetime;
             if (r === 0) {
-                return n; // If discount rate is 0, PV factor is simply the lifetime
+                return lifetime;
             }
-            return (1 - Math.pow(1 + r, -n)) / r;
+            return (1 - Math.pow(1 + r, -lifetime)) / r;
         }
 
-        // --- Cost Inputs Calculation ---
-        function calculateCostInputs(pvFactor, sensitivityMultiplier = 1) {
-            let totalCostBase = 0;
-            let totalCostBuild = 0;
-
-            const costBreakdownBase = { capital: 0, om: 0, rr: 0 };
-            const costBreakdownBuild = { capital: 0, om: 0, rr: 0 };
-
-            // Group costs by data-group-id for individual item summaries
-            const groupCosts = {}; // { 'group-id': { capital: X, om: Y, rr: Z, total: W } }
-
-            document.querySelectorAll('#costInputsTableBody .cost-detail-row').forEach(row => {
-                const groupId = row.dataset.groupId;
-                const costType = row.querySelector('.costType').value;
-                const annualCost = parseFloat(row.querySelector('.annualCost').value) || 0;
-                const totalDiscountedCostCell = row.querySelector('.totalDiscountedCost-item');
-
-                let discountedCost;
-                if (costType === 'Capital' || costType === 'R&R') {
-                    discountedCost = annualCost * sensitivityMultiplier;
-                } else { // O&M
-                    discountedCost = annualCost * pvFactor * sensitivityMultiplier;
-                }
-
-                totalDiscountedCostCell.textContent = discountedCost.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-
-                if (!groupCosts[groupId]) {
-                    groupCosts[groupId] = { capital: 0, om: 0, rr: 0, total: 0 };
-                }
-                groupCosts[groupId].total += discountedCost;
-                if (costType === 'Capital') groupCosts[groupId].capital += discountedCost;
-                else if (costType === 'O&M') groupCosts[groupId].om += discountedCost;
-                else if (costType === 'R&R') groupCosts[groupId].rr += discountedCost;
-            });
-
-            // Update group header summaries and accumulate total case costs
-            document.querySelectorAll('#costInputsTableBody .cost-group-header').forEach(headerRow => {
-                const groupId = headerRow.dataset.groupId;
-                const caseType = headerRow.dataset.caseType;
-                const groupSummary = groupCosts[groupId] || { total: 0, capital: 0, om: 0, rr: 0 };
-
-                headerRow.querySelector('.totalDiscountedCost').textContent = groupSummary.total.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-
-                if (caseType === 'Base Case') {
-                    totalCostBase += groupSummary.total;
-                    costBreakdownBase.capital += groupSummary.capital;
-                    costBreakdownBase.om += groupSummary.om;
-                    costBreakdownBase.rr += groupSummary.rr;
-                } else if (caseType === 'Build Case') {
-                    totalCostBuild += groupSummary.total;
-                    costBreakdownBuild.capital += groupSummary.capital;
-                    costBreakdownBuild.om += groupSummary.om;
-                    costBreakdownBuild.rr += groupSummary.rr;
-                }
-            });
-
-            document.getElementById('totalDiscountedCostBase').textContent = totalCostBase.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('totalDiscountedCostBuild').textContent = totalCostBuild.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-
-            return {
-                totalCostBase,
-                totalCostBuild,
-                costBreakdownBase,
-                costBreakdownBuild
-            };
-        }
-
-        // --- Benefit Selection & Quantification Calculation ---
-        function calculateBenefitInputs(pvFactor, sensitivityMultiplier = 1) {
-            let totalBenefitBase = 0;
-            let totalBenefitBuild = 0;
-
-            document.querySelectorAll('#benefitInputsTableBody tr').forEach(row => {
-                const applicableTo = Array.from(row.querySelector('.applicableTo').selectedOptions).map(option => option.value);
-                const selected = row.querySelector('.benefitSelected').checked;
-                const annualBenefitValue = parseFloat(row.querySelector('.annualBenefitValue').value) || 0;
-                const appliedBenefitCell = row.querySelector('.appliedBenefit');
-
-                let appliedBenefit = 0;
-                if (selected) {
-                    appliedBenefit = annualBenefitValue * pvFactor * sensitivityMultiplier;
-                }
-                appliedBenefitCell.textContent = appliedBenefit.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-
-                if (applicableTo.includes('Base Case')) {
-                    totalBenefitBase += appliedBenefit;
-                }
-                if (applicableTo.includes('Build Case')) {
-                    totalBenefitBuild += appliedBenefit;
-                }
-            });
-
-            document.getElementById('totalAppliedBenefitBase').textContent = totalBenefitBase.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('totalAppliedBenefitBuild').textContent = totalBenefitBuild.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-
-            return { totalBenefitBase, totalBenefitBuild };
-        }
-
-        // --- NPV & BCR Calculator ---
-        function calculateNPV_BCR(costs, benefits, updateCharts = true) {
-            // Base Case
-            const npvBase = benefits.totalBenefitBase - costs.totalCostBase;
-            const bcrBase = costs.totalCostBase === 0 ? (benefits.totalBenefitBase > 0 ? Infinity : 0) : benefits.totalBenefitBase / costs.totalCostBase;
-
-            document.getElementById('npvBcrCostBase').textContent = costs.totalCostBase.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('npvBcrBenefitBase').textContent = benefits.totalBenefitBase.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('npvBase').textContent = npvBase.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('npvBase').className = npvBase >= 0 ? 'positive' : 'negative';
-            document.getElementById('bcrBase').textContent = isFinite(bcrBase) ? bcrBase.toFixed(2) : (bcrBase === Infinity ? 'Infinite' : 'N/A');
-            document.getElementById('bcrBase').className = bcrBase >= 1 ? 'positive' : (isFinite(bcrBase) ? 'negative' : '');
-
-            // Build Case
-            const npvBuild = benefits.totalBenefitBuild - costs.totalCostBuild;
-            const bcrBuild = costs.totalCostBuild === 0 ? (benefits.totalBenefitBuild > 0 ? Infinity : 0) : benefits.totalBenefitBuild / costs.totalCostBuild;
-
-            document.getElementById('npvBcrCostBuild').textContent = costs.totalCostBuild.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('npvBcrBenefitBuild').textContent = benefits.totalBenefitBuild.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('npvBuild').textContent = npvBuild.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            document.getElementById('npvBuild').className = npvBuild >= 0 ? 'positive' : 'negative';
-            document.getElementById('bcrBuild').textContent = isFinite(bcrBuild) ? bcrBuild.toFixed(2) : (bcrBuild === Infinity ? 'Infinite' : 'N/A');
-            document.getElementById('bcrBuild').className = bcrBuild >= 1 ? 'positive' : (isFinite(bcrBuild) ? 'negative' : '');
-
-            if (updateCharts) {
-                updateChartsWithData(costs, benefits, npvBase, bcrBase, npvBuild, bcrBuild);
+        function calculateDiscountedValue(annualCost, costType, pvFactor) {
+            if (costType === 'Capital') {
+                return annualCost;
+            } else if (costType === 'O&M' || costType === 'R&R') {
+                return annualCost * pvFactor;
             }
-
-            return { npvBase, bcrBase, npvBuild, bcrBuild };
+            return 0;
         }
 
-        // --- Charting Functions ---
-        function initializeCharts() {
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false, // Allows chart to fit into container without fixed aspect ratio
-                plugins: {
-                    legend: { display: true, position: 'top' },
-                    tooltip: { mode: 'index', intersect: false },
-                    title: { display: true, text: '' } // Title will be set per chart
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            };
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+        }
 
-            const ctxLifecycle = document.getElementById('lifecycleCostChart').getContext('2d');
-            lifecycleCostChart = new Chart(ctxLifecycle, {
-                type: 'bar',
-                data: { labels: ['Capital', 'O&M', 'R&R'], datasets: [] },
-                options: {
-                    ...chartOptions,
-                    plugins: { ...chartOptions.plugins, title: { display: true, text: 'Total Discounted Lifecycle Costs by Type' } },
-                    scales: {
-                        x: { stacked: false },
-                        y: { stacked: false, beginAtZero: true, title: { display: true, text: 'Cost (USD)'} }
+        // --- Render Functions ---
+        function renderCostTable() {
+            const tableBody = document.getElementById('costInputsTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const discountRate = parseFloat(document.getElementById('discountRate').value);
+            const lifetime = parseInt(document.getElementById('lifetime').value);
+            const pvFactor = calculatePVFactor(discountRate, lifetime);
+            document.getElementById('pvFactorDisplay').textContent = pvFactor.toFixed(4);
+
+            let baseTotalCost = 0;
+            let buildTotalCost = 0;
+
+            currentCosts.forEach((item, index) => {
+                let rowHtml = '';
+                if (item.type === 'group') {
+                    rowHtml = `
+                        <tr class="cost-group-header ${item.expanded ? 'expanded' : ''}" data-case-type="${item.caseType}" data-group-id="${item.id}">
+                            <td><span class="toggle-icon">${item.expanded ? '&#9660;' : '&#9658;'}</span> ${item.caseType}</td>
+                            <td>${item.name}</td>
+                            <td>Summary</td>
+                            <td></td>
+                            <td class="pvFactor"></td>
+                            <td class="totalDiscountedCost"></td>
+                            <td><input type="text" class="notes" value="${item.notes}" readonly></td>
+                            <td><button class="delete-btn" data-row-index="${index}">Delete Group</button></td>
+                        </tr>
+                    `;
+                } else if (item.type === 'detail') {
+                    const discountedCost = calculateDiscountedValue(item.annualCost, item.costType, pvFactor);
+                    rowHtml = `
+                        <tr class="cost-detail-row" data-group-id="${item.groupId}" data-row-index="${index}" ${currentCosts.find(g => g.id === item.groupId && g.expanded) ? '' : 'style="display:none;"'}>
+                            <td></td>
+                            <td><input type="text" class="systemName" value="${item.systemName}"></td>
+                            <td>
+                                <select class="costType">
+                                    <option value="Capital" ${item.costType === 'Capital' ? 'selected' : ''}>Capital</option>
+                                    <option value="O&M" ${item.costType === 'O&M' ? 'selected' : ''}>O&M</option>
+                                    <option value="R&R" ${item.costType === 'R&R' ? 'selected' : ''}>R&R</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="annualCost" value="${item.annualCost}" min="0"></td>
+                            <td class="pvFactor">${item.costType === 'Capital' ? 'N/A' : pvFactor.toFixed(4)}</td>
+                            <td class="totalDiscountedCost-item">${formatCurrency(discountedCost)}</td>
+                            <td><input type="text" class="notes" value="${item.notes || ''}"></td>
+                            <td><button class="delete-btn" data-row-index="${index}">Delete</button></td>
+                        </tr>
+                    `;
+
+                    if (item.caseType === 'Base Case') {
+                        baseTotalCost += discountedCost;
+                    } else if (item.caseType === 'Build Case') {
+                        buildTotalCost += discountedCost;
                     }
+                }
+                tableBody.insertAdjacentHTML('beforeend', rowHtml);
+            });
+
+            // Update summary totals for groups
+            currentCosts.filter(item => item.type === 'group').forEach(group => {
+                const groupCost = currentCosts.filter(detail => detail.type === 'detail' && detail.groupId === group.id)
+                                            .reduce((sum, detail) => sum + calculateDiscountedValue(detail.annualCost, detail.costType, pvFactor), 0);
+                const groupRow = tableBody.querySelector(`tr.cost-group-header[data-group-id="${group.id}"] .totalDiscountedCost`);
+                if (groupRow) {
+                    groupRow.textContent = formatCurrency(groupCost);
                 }
             });
 
-            const ctxNpvBcr = document.getElementById('npvBcrComparisonChart').getContext('2d');
-            npvBcrComparisonChart = new Chart(ctxNpvBcr, {
-                type: 'bar',
-                data: { labels: ['Base Case', 'Build Case'], datasets: [] },
-                options: {
-                    ...chartOptions,
-                    plugins: { ...chartOptions.plugins, title: { display: true, text: 'NPV & BCR Comparison' } },
-                    scales: {
-                        y: { beginAtZero: true, position: 'left', title: { display: true, text: 'Value (USD)'}},
-                        y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Ratio' }, grid: { drawOnChartArea: false }}
-                    }
-                }
-            });
 
-            const ctxSensitivityNpv = document.getElementById('sensitivityNPVChart').getContext('2d');
-            sensitivityNPVChart = new Chart(ctxSensitivityNpv, {
-                type: 'bar',
-                data: { labels: ['Base Case (Adjusted NPV)', 'Build Case (Adjusted NPV)'], datasets: [] },
-                options: {
-                    ...chartOptions,
-                    plugins: { ...chartOptions.plugins, title: { display: true, text: 'Adjusted NPV with Sensitivity' } },
-                    scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Adjusted NPV (USD)'} }
-                    }
-                }
-            });
+            document.getElementById('totalDiscountedCostBase').textContent = formatCurrency(baseTotalCost);
+            document.getElementById('totalDiscountedCostBuild').textContent = formatCurrency(buildTotalCost);
+
+            // Re-attach event listeners after rendering
+            attachCostTableListeners();
+            updateCharts(); // Update charts after cost changes
         }
 
-        function updateChartsWithData(costs, benefits, npvBase, bcrBase, npvBuild, bcrBuild) {
-            // Lifecycle Cost Chart
-            lifecycleCostChart.data.datasets = [
-                {
-                    label: 'Base Case Costs',
-                    data: [costs.costBreakdownBase.capital, costs.costBreakdownBase.om, costs.costBreakdownBase.rr],
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Build Case Costs',
-                    data: [costs.costBreakdownBuild.capital, costs.costBreakdownBuild.om, costs.costBreakdownBuild.rr],
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }
-            ];
-            lifecycleCostChart.update();
+        function renderBenefitTable() {
+            const tableBody = document.getElementById('benefitInputsTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
 
-            // NPV & BCR Comparison Chart
-            npvBcrComparisonChart.data.datasets = [
-                {
-                    label: 'NPV (USD)',
-                    data: [npvBase, npvBuild],
-                    backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
-                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
-                    borderWidth: 1,
-                    type: 'bar',
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'BCR',
-                    data: [bcrBase, bcrBuild],
-                    backgroundColor: ['rgba(255, 205, 86, 0.6)', 'rgba(255, 159, 64, 0.6)'],
-                    borderColor: ['rgba(255, 205, 86, 1)', 'rgba(255, 159, 64, 1)'],
-                    borderWidth: 1,
-                    type: 'line', // Line for ratio
-                    fill: false,
-                    yAxisID: 'y1'
-                }
-            ];
-            npvBcrComparisonChart.update();
-
-            // Sensitivity NPV Chart (default values)
-            sensitivityNPVChart.data.datasets = [
-                 {
-                    label: 'NPV (USD)',
-                    data: [npvBase, npvBuild],
-                    backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
-                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
-                    borderWidth: 1
-                }
-            ];
-            sensitivityNPVChart.update();
-        }
-
-        // --- Main Calculation Function ---
-        function performCalculations(sensitivity = 0) {
-            const discountRate = parseFloat(document.getElementById('discountRate').value) || 0;
-            const lifetime = parseFloat(document.getElementById('lifetime').value) || 0;
+            const discountRate = parseFloat(document.getElementById('discountRate').value);
+            const lifetime = parseInt(document.getElementById('lifetime').value);
             const pvFactor = calculatePVFactor(discountRate, lifetime);
 
-            document.getElementById('pvFactorDisplay').textContent = pvFactor.toFixed(3);
+            let baseTotalBenefit = 0;
+            let buildTotalBenefit = 0;
 
-            // Update PV Factor in all displayed cells
-            document.querySelectorAll('.pvFactor').forEach(cell => {
-                cell.textContent = pvFactor.toFixed(3);
+            currentBenefits.forEach((item, index) => {
+                const discountedBenefit = calculateDiscountedValue(item.annualValue, 'O&M', pvFactor); // Benefits are like O&M
+                const applicableBaseChecked = item.applicableTo.includes('Base Case') ? 'checked' : '';
+                const applicableBuildChecked = item.applicableTo.includes('Build Case') ? 'checked' : '';
+
+                let rowHtml = `
+                    <tr data-row-index="${index}">
+                        <td><input type="text" class="benefitType" value="${item.benefitType}"></td>
+                        <td>
+                            <label><input type="checkbox" class="applicableToBase" ${applicableBaseChecked}> Base</label><br>
+                            <label><input type="checkbox" class="applicableToBuild" ${applicableBuildChecked}> Build</label>
+                        </td>
+                        <td><input type="checkbox" class="benefitSelected" ${item.selected ? 'checked' : ''}></td>
+                        <td><input type="number" class="annualValue" value="${item.annualValue}" min="0"></td>
+                        <td class="pvFactor">${pvFactor.toFixed(4)}</td>
+                        <td class="totalDiscountedBenefit-item">${formatCurrency(discountedBenefit)}</td>
+                        <td><input type="text" class="justification" value="${item.justification || ''}"></td>
+                        <td><button class="delete-btn" data-row-index="${index}">Delete</button></td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', rowHtml);
+
+                if (item.selected) {
+                    if (item.applicableTo.includes('Base Case')) {
+                        baseTotalBenefit += discountedBenefit;
+                    }
+                    if (item.applicableTo.includes('Build Case')) {
+                        buildTotalBenefit += discountedBenefit;
+                    }
+                }
             });
 
-            // For sensitivity analysis
-            const sensitivityMultiplier = 1 + (sensitivity / 100);
+            document.getElementById('totalAppliedBenefitBase').textContent = formatCurrency(baseTotalBenefit);
+            document.getElementById('totalAppliedBenefitBuild').textContent = formatCurrency(buildTotalBenefit);
 
-            const costs = calculateCostInputs(pvFactor, sensitivityMultiplier);
-            const benefits = calculateBenefitInputs(pvFactor, sensitivityMultiplier);
-            const { npvBase, npvBuild } = calculateNPV_BCR(costs, benefits, true); // Update all charts
+            // Re-attach event listeners after rendering
+            attachBenefitTableListeners();
+            updateCharts(); // Update charts after benefit changes
+        }
 
-            // Update sensitivity chart specifically
-            if (sensitivityNPVChart) {
-                sensitivityNPVChart.data.datasets[0].data = [npvBase, npvBuild];
-                sensitivityNPVChart.update();
+        // --- Add/Delete Row Functions ---
+        function addCostRow() {
+            // Prompt user for caseType
+            let caseTypeChoice = prompt("Add new cost item group for: (Type 'Base Case' or 'Build Case')");
+            if (!caseTypeChoice) {
+                return; // User cancelled
             }
+            caseTypeChoice = caseTypeChoice.trim();
+            if (caseTypeChoice !== 'Base Case' && caseTypeChoice !== 'Build Case') {
+                alert("Invalid input. Please type 'Base Case' or 'Build Case'.");
+                return;
+            }
+
+            // Generate a unique ID for the new collapsible group
+            const newGroupId = `user-added-group-${Date.now()}`; // Unique ID based on timestamp
+            const groupName = `User Added Item (${caseTypeChoice})`;
+
+            // Add the new group header
+            currentCosts.push({
+                caseType: caseTypeChoice,
+                type: 'group',
+                name: groupName,
+                id: newGroupId,
+                notes: 'User added custom cost group',
+                expanded: true // New groups should be expanded by default
+            });
+
+            // Add the three default detail rows inside this new group
+            currentCosts.push({
+                caseType: caseTypeChoice,
+                type: 'detail',
+                groupId: newGroupId,
+                systemName: 'Capital Cost',
+                costType: 'Capital',
+                annualCost: 0,
+                notes: 'Initial capital investment'
+            });
+            currentCosts.push({
+                caseType: caseTypeChoice,
+                type: 'detail',
+                groupId: newGroupId,
+                systemName: 'O&M Cost',
+                costType: 'O&M',
+                annualCost: 0,
+                notes: 'Annual operating & maintenance'
+            });
+            currentCosts.push({
+                caseType: caseTypeChoice,
+                type: 'detail',
+                groupId: newGroupId,
+                systemName: 'R&R Cost',
+                costType: 'R&R',
+                annualCost: 0,
+                notes: 'Annualized repair & replacement'
+            });
+
+            // Re-render the table to show the new rows
+            renderCostTable();
+        }
+
+        function deleteCostRow(index) {
+            const itemToDelete = currentCosts[index];
+            if (itemToDelete.type === 'detail') {
+                currentCosts.splice(index, 1);
+            } else if (itemToDelete.type === 'group') {
+                // If it's a group, confirm deletion of all its details
+                if (confirm(`Are you sure you want to delete the group "${itemToDelete.name}" and all its associated detail items?`)) {
+                    // Filter out the group itself and all detail items belonging to this group
+                    currentCosts = currentCosts.filter(item => item.id !== itemToDelete.id && item.groupId !== itemToDelete.id);
+                } else {
+                    return; // Stop if user cancels
+                }
+            }
+            renderCostTable();
+        }
+
+        function addBenefitRow() {
+            currentBenefits.push({
+                benefitType: 'New Benefit Item',
+                quantification: 'Add quantification method here.',
+                applicableTo: ['Build Case'], // Default to build case
+                selected: true,
+                annualValue: 0,
+                justification: ''
+            });
+            renderBenefitTable();
+        }
+
+        function deleteBenefitRow(index) {
+            currentBenefits.splice(index, 1);
+            renderBenefitTable();
         }
 
         // --- Event Listeners ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeCharts(); // Initialize charts when DOM is ready
+        function attachCostTableListeners() {
+            const tableBody = document.getElementById('costInputsTableBody');
 
-            // Initial calculation on page load
-            performCalculations();
+            // Attach listeners to input fields (systemName, annualCost, costType, notes)
+            tableBody.querySelectorAll('input, select').forEach(input => {
+                input.oninput = (e) => {
+                    const row = e.target.closest('.cost-detail-row');
+                    if (!row) return;
 
-            // Listen for changes in Dynamic Inputs (Discount Rate, Lifetime)
-            document.getElementById('discountRate').addEventListener('input', () => performCalculations());
-            document.getElementById('lifetime').addEventListener('input', () => performCalculations());
+                    const index = parseInt(row.dataset.rowIndex);
+                    const item = currentCosts[index];
 
-            // Listen for changes in Cost Inputs (detail rows)
-            document.querySelectorAll('#costInputsTableBody input, #costInputsTableBody select').forEach(element => {
-                element.addEventListener('input', () => performCalculations());
-                element.addEventListener('change', () => performCalculations());
+                    if (e.target.classList.contains('systemName')) {
+                        item.systemName = e.target.value;
+                    } else if (e.target.classList.contains('annualCost')) {
+                        item.annualCost = parseFloat(e.target.value) || 0;
+                    } else if (e.target.classList.contains('costType')) {
+                        item.costType = e.target.value;
+                    } else if (e.target.classList.contains('notes')) {
+                        item.notes = e.target.value;
+                    }
+                    renderCostTable(); // Re-render to update discounted costs and totals
+                };
             });
 
-            // Listen for changes in Benefit Inputs
-            document.querySelectorAll('#benefitInputsTableBody input, #benefitInputsTableBody select').forEach(element => {
-                element.addEventListener('input', () => performCalculations());
-                element.addEventListener('change', () => performCalculations());
-            });
+            // Attach listeners to group headers for expanding/collapsing
+            tableBody.querySelectorAll('.cost-group-header').forEach(header => {
+                header.onclick = (e) => {
+                    // Prevent event from bubbling if a button inside the header was clicked
+                    if (e.target.tagName === 'BUTTON') return;
 
-            // Collapsible row toggles
-            document.querySelectorAll('.cost-group-header').forEach(header => {
-                header.addEventListener('click', () => {
                     const groupId = header.dataset.groupId;
-                    header.classList.toggle('expanded');
-                    const detailRows = document.querySelectorAll(`.cost-detail-row[data-group-id="${groupId}"]`);
-                    detailRows.forEach(row => {
-                        row.style.display = header.classList.contains('expanded') ? 'table-row' : 'none';
+                    const groupItem = currentCosts.find(g => g.type === 'group' && g.id === groupId);
+                    if (groupItem) {
+                        groupItem.expanded = !groupItem.expanded;
+                        // Toggle icon
+                        const toggleIcon = header.querySelector('.toggle-icon');
+                        if (groupItem.expanded) {
+                            toggleIcon.innerHTML = '&#9660;'; // Down arrow
+                            header.classList.add('expanded');
+                        } else {
+                            toggleIcon.innerHTML = '&#9658;'; // Right arrow
+                            header.classList.remove('expanded');
+                        }
+                    }
+
+                    // Toggle visibility of detail rows
+                    tableBody.querySelectorAll(`.cost-detail-row[data-group-id="${groupId}"]`).forEach(row => {
+                        row.style.display = groupItem.expanded ? 'table-row' : 'none';
                     });
-                });
+                };
             });
+
+            // Attach listeners to delete buttons
+            tableBody.querySelectorAll('.delete-btn').forEach(button => {
+                button.onclick = (e) => {
+                    const index = parseInt(e.target.dataset.rowIndex);
+                    deleteCostRow(index);
+                };
+            });
+        }
+
+        function attachBenefitTableListeners() {
+            const tableBody = document.getElementById('benefitInputsTableBody');
+
+            // Attach listeners to input fields
+            tableBody.querySelectorAll('input, select').forEach(input => {
+                input.oninput = (e) => {
+                    const row = e.target.closest('tr');
+                    if (!row) return;
+
+                    const index = parseInt(row.dataset.rowIndex);
+                    const item = currentBenefits[index];
+
+                    if (e.target.classList.contains('benefitType')) {
+                        item.benefitType = e.target.value;
+                    } else if (e.target.classList.contains('annualValue')) {
+                        item.annualValue = parseFloat(e.target.value) || 0;
+                    } else if (e.target.classList.contains('justification')) {
+                        item.justification = e.target.value;
+                    } else if (e.target.classList.contains('benefitSelected')) {
+                        item.selected = e.target.checked;
+                    } else if (e.target.classList.contains('applicableToBase')) {
+                        if (e.target.checked && !item.applicableTo.includes('Base Case')) {
+                            item.applicableTo.push('Base Case');
+                        } else if (!e.target.checked) {
+                            item.applicableTo = item.applicableTo.filter(caseType => caseType !== 'Base Case');
+                        }
+                    } else if (e.target.classList.contains('applicableToBuild')) {
+                        if (e.target.checked && !item.applicableTo.includes('Build Case')) {
+                            item.applicableTo.push('Build Case');
+                        } else if (!e.target.checked) {
+                            item.applicableTo = item.applicableTo.filter(caseType => caseType !== 'Build Case');
+                        }
+                    }
+                    renderBenefitTable(); // Re-render to update discounted benefits and totals
+                };
+            });
+
+            // Attach listeners to delete buttons
+            tableBody.querySelectorAll('.delete-btn').forEach(button => {
+                button.onclick = (e) => {
+                    const index = parseInt(e.target.dataset.rowIndex);
+                    deleteBenefitRow(index);
+                };
+            });
+        }
+
+
+        // --- Charting Functions ---
+        function updateCharts(sensitivityAdjustment = 0) {
+            const discountRate = parseFloat(document.getElementById('discountRate').value);
+            const lifetime = parseInt(document.getElementById('lifetime').value);
+            const pvFactor = calculatePVFactor(discountRate, lifetime);
+
+            let baseCostTotal = 0;
+            let buildCostTotal = 0;
+            let baseCapitalCost = 0;
+            let baseOMCost = 0;
+            let baseRRRcost = 0;
+            let buildCapitalCost = 0;
+            let buildOMCost = 0;
+            let buildRRRcost = 0;
+
+            currentCosts.filter(item => item.type === 'detail').forEach(item => {
+                const adjustedCost = (item.annualCost * (1 + sensitivityAdjustment / 100));
+                const discountedCost = calculateDiscountedValue(adjustedCost, item.costType, pvFactor);
+
+                if (item.caseType === 'Base Case') {
+                    baseCostTotal += discountedCost;
+                    if (item.costType === 'Capital') baseCapitalCost += discountedCost;
+                    else if (item.costType === 'O&M') baseOMCost += discountedCost;
+                    else if (item.costType === 'R&R') baseRRRcost += discountedCost;
+                } else if (item.caseType === 'Build Case') {
+                    buildCostTotal += discountedCost;
+                    if (item.costType === 'Capital') buildCapitalCost += discountedCost;
+                    else if (item.costType === 'O&M') buildOMCost += discountedCost;
+                    else if (item.costType === 'R&R') buildRRRcost += discountedCost;
+                }
+            });
+
+            let baseBenefitTotal = 0;
+            let buildBenefitTotal = 0;
+
+            currentBenefits.forEach(item => {
+                if (item.selected) {
+                    const adjustedBenefit = (item.annualValue * (1 + sensitivityAdjustment / 100));
+                    const discountedBenefit = calculateDiscountedValue(adjustedBenefit, 'O&M', pvFactor); // Benefits are treated like O&M for PV factor
+
+                    if (item.applicableTo.includes('Base Case')) {
+                        baseBenefitTotal += discountedBenefit;
+                    }
+                    if (item.applicableTo.includes('Build Case')) {
+                        buildBenefitTotal += discountedBenefit;
+                    }
+                }
+            });
+
+            const baseNPV = baseBenefitTotal - baseCostTotal;
+            const buildNPV = buildBenefitTotal - buildCostTotal;
+
+            const baseBCR = baseCostTotal > 0 ? baseBenefitTotal / baseCostTotal : (baseBenefitTotal > 0 ? Infinity : 0);
+            const buildBCR = buildCostTotal > 0 ? buildBenefitTotal / buildCostTotal : (buildBenefitTotal > 0 ? Infinity : 0);
+
+            // Update summary boxes
+            document.getElementById('baseCostSummary').textContent = formatCurrency(baseCostTotal);
+            document.getElementById('baseBenefitSummary').textContent = formatCurrency(baseBenefitTotal);
+            document.getElementById('baseNPV').textContent = formatCurrency(baseNPV);
+            document.getElementById('baseNPV').className = baseNPV >= 0 ? 'positive' : 'negative';
+            document.getElementById('baseBCR').textContent = isFinite(baseBCR) ? baseBCR.toFixed(2) : (baseBCR === Infinity ? 'Infinite' : 'N/A');
+            document.getElementById('baseBCR').className = baseBCR >= 1 ? 'positive' : 'negative';
+
+            document.getElementById('buildCostSummary').textContent = formatCurrency(buildCostTotal);
+            document.getElementById('buildBenefitSummary').textContent = formatCurrency(buildBenefitTotal);
+            document.getElementById('buildNPV').textContent = formatCurrency(buildNPV);
+            document.getElementById('buildNPV').className = buildNPV >= 0 ? 'positive' : 'negative';
+            document.getElementById('buildBCR').textContent = isFinite(buildBCR) ? buildBCR.toFixed(2) : (buildBCR === Infinity ? 'Infinite' : 'N/A');
+            document.getElementById('buildBCR').className = buildBCR >= 1 ? 'positive' : 'negative';
+
+            // --- Update Charts ---
+            // Chart 1: Lifecycle Cost Composition
+            if (costCompositionChart) costCompositionChart.destroy();
+            const ctx1 = document.getElementById('costCompositionChart').getContext('2d');
+            costCompositionChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Base Case', 'Build Case'],
+                    datasets: [
+                        {
+                            label: 'Capital Costs',
+                            data: [baseCapitalCost, buildCapitalCost],
+                            backgroundColor: '#007bff',
+                            stack: 'costs'
+                        },
+                        {
+                            label: 'O&M Costs',
+                            data: [baseOMCost, buildOMCost],
+                            backgroundColor: '#28a745',
+                            stack: 'costs'
+                        },
+                        {
+                            label: 'R&R Costs',
+                            data: [baseRRRcost, buildRRRcost],
+                            backgroundColor: '#ffc107',
+                            stack: 'costs'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: { display: true, text: 'Costs (USD)' },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += formatCurrency(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: NPV & BCR Comparison
+            if (npvBcrChart) npvBcrChart.destroy();
+            const ctx2 = document.getElementById('npvBcrChart').getContext('2d');
+            npvBcrChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Base Case', 'Build Case'],
+                    datasets: [
+                        {
+                            label: 'Net Present Value (NPV)',
+                            data: [baseNPV, buildNPV],
+                            backgroundColor: ['#007bff', '#28a745'],
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Benefit-Cost Ratio (BCR)',
+                            data: [baseBCR, buildBCR],
+                            type: 'line',
+                            borderColor: '#ffc107',
+                            backgroundColor: '#ffc107',
+                            fill: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'NPV (USD)' },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: 'BCR' },
+                            min: 0
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataset.label.includes('NPV')) {
+                                        label += formatCurrency(context.parsed.y);
+                                    } else {
+                                        label += context.parsed.y.toFixed(2);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: Adjusted NPV Comparison (Sensitivity)
+            if (adjustedNpvChart) adjustedNpvChart.destroy();
+            const ctx3 = document.getElementById('adjustedNpvChart').getContext('2d');
+            adjustedNpvChart = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['Base Case', 'Build Case'],
+                    datasets: [
+                        {
+                            label: 'Adjusted Net Present Value (NPV)',
+                            data: [baseNPV, buildNPV],
+                            backgroundColor: [
+                                baseNPV >= 0 ? '#007bff' : '#dc3545', // Blue for positive, Red for negative
+                                buildNPV >= 0 ? '#28a745' : '#dc3545'
+                            ]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false, // Allow negative values for NPV
+                            title: { display: true, text: 'Adjusted NPV (USD)' },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += formatCurrency(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Reset Function ---
+        function resetToDefaults() {
+            if (confirm("Are you sure you want to reset all data to default values? This cannot be undone.")) {
+                currentCosts = JSON.parse(JSON.stringify(defaultCosts)); // Reset to deep copy of defaults
+                currentBenefits = JSON.parse(JSON.stringify(defaultBenefits)); // Reset to deep copy of defaults
+                document.getElementById('discountRate').value = 7;
+                document.getElementById('lifetime').value = 10;
+                document.getElementById('sensitivitySlider').value = 0;
+                document.getElementById('sensitivityValue').textContent = 0;
+                renderCostTable();
+                renderBenefitTable();
+                updateCharts(); // Ensure all calculations and charts are updated
+            }
+        }
+
+        // --- Initial Load & Event Bindings ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCostTable();
+            renderBenefitTable();
+
+            // Global inputs
+            document.getElementById('discountRate').addEventListener('input', () => {
+                renderCostTable();
+                renderBenefitTable();
+            });
+            document.getElementById('lifetime').addEventListener('input', () => {
+                renderCostTable();
+                renderBenefitTable();
+            });
+
+            // Add Row Buttons
+            document.getElementById('addCostRowBtn').addEventListener('click', addCostRow); // No arguments needed here
+            document.getElementById('addBenefitRowBtn').addEventListener('click', addBenefitRow);
+
+            // Reset Button
+            document.getElementById('resetButton').addEventListener('click', resetToDefaults);
 
             // Sensitivity Slider
-            const sensitivitySlider = document.getElementById('sensitivitySlider');
-            const sensitivityValueDisplay = document.getElementById('sensitivityValue');
-            sensitivitySlider.addEventListener('input', () => {
-                const sensitivity = parseFloat(sensitivitySlider.value);
-                sensitivityValueDisplay.textContent = `${sensitivity}%`;
-                performCalculations(sensitivity);
-            });
-
-            // Adjust 'Applicable to' multi-select width for better visibility
-            document.querySelectorAll('.applicableTo').forEach(select => {
-                select.size = 2; // Show 2 options by default
-                select.style.height = 'auto'; // Adjust height dynamically
+            document.getElementById('sensitivitySlider').addEventListener('input', (e) => {
+                const sensitivity = parseFloat(e.target.value);
+                document.getElementById('sensitivityValue').textContent = sensitivity;
+                updateCharts(sensitivity);
             });
         });
-    </script>
 
+    </script>
 </body>
 </html>
